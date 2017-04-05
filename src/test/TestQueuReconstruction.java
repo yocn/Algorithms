@@ -2,6 +2,7 @@ package test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 
 /**
  * Link:https://leetcode.com/problems/queue-reconstruction-by-height/
@@ -110,13 +111,95 @@ public class TestQueuReconstruction {
 	public static int[][] exceptPeople = { { 5, 0 }, { 7, 0 }, { 5, 2 }, { 6, 1 }, { 4, 4 }, { 7, 1 } };
 
 	public static void main(String[] args) {
-//		people = testPeople2;
+		// people = testPeople2;
 		// int[] x = { 5, 2 };
 		// System.out.println(isExpect(2, x));
 		// System.out.println(getFrontNum(x, 5));
 		// Println(people);
 		// Println(exceptPeople);
-		reconstructQueue(people);
+
+		Println(people);
+		Arrays.sort(people, new Comparator<int[]>() {
+			public int compare(int[] a, int[] b) {
+				if (b[0] == a[0])
+					return a[1] - b[1];
+				return b[0] - a[0];
+			}
+		});
+		Println(people);
+
+		reconstructQueue1(people);
+	}
+
+	/**
+	 * 
+	 * 这个是按照顺序由大到小排序，因为后面要插入的总是比之前的h要小的，所以不担心插入进去会破坏原来的顺序，只需要关心当前插入的数组的位置就好
+	 * 
+	 * 原始数组
+	 * 
+	 * [5,0] [7,0] [4,4] [7,1] [6,1] [5,2]
+	 * 
+	 * sort之后的数组
+	 * 
+	 * [7,0] [7,1] [6,1][5,0] [5,2] [4,4]
+	 * 
+	 * 遍历过程中的数组
+	 * 
+	 * people[i]=[7,0]
+	 * 
+	 * [7,0]
+	 * 
+	 * people[i]=[7,1]
+	 * 
+	 * [7,0] [7,1]
+	 * 
+	 * people[i]=[6,1]
+	 * 
+	 * [7,0] [6,1] [7,1]
+	 * 
+	 * people[i]=[5,0]
+	 * 
+	 * [5,0] [7,0] [6,1] [7,1]
+	 * 
+	 * people[i]=[5,2]
+	 * 
+	 * [5,0] [7,0] [5,2] [6,1] [7,1]
+	 * 
+	 * people[i]=[4,4]
+	 * 
+	 * [5,0] [7,0] [5,2] [6,1] [4,4] [7,1]
+	 * 
+	 * @param people
+	 * @return
+	 */
+	public static int[][] reconstructQueue1(int[][] people) {
+		if (people == null || people.length == 0 || people[0].length == 0)
+			return new int[0][0];
+
+		Arrays.sort(people, new Comparator<int[]>() {
+			public int compare(int[] a, int[] b) {
+				if (b[0] == a[0])
+					return a[1] - b[1];
+				return b[0] - a[0];
+			}
+		});
+
+		int n = people.length;
+		ArrayList<int[]> tmp = new ArrayList<int[]>();
+		for (int i = 0; i < n; i++) {
+			System.out.println("people[i]=[" + people[i][0] + "," + people[i][1] + "]");
+			tmp.add(people[i][1], new int[] { people[i][0], people[i][1] });
+			Println(tmp);
+		}
+
+		int[][] res = new int[people.length][2];
+		int i = 0;
+		for (int[] k : tmp) {
+			res[i][0] = k[0];
+			res[i++][1] = k[1];
+		}
+		Println("res--", res);
+		return res;
 	}
 
 	public static int[][] reconstructQueue(int[][] people1) {
@@ -161,7 +244,7 @@ public class TestQueuReconstruction {
 					}
 
 					Bean bean = new Bean();
-					loop3:for (int x = 0; x < intList.size(); x++) {
+					loop3: for (int x = 0; x < intList.size(); x++) {
 						boolean expect = true;
 						int[] tempTarget = intList.get(x).getArray();
 						/** 第x个设置为当前位置的数组，测试其他的作为n+1是否合适的 */
@@ -172,7 +255,7 @@ public class TestQueuReconstruction {
 							if (i + 1 < people.length && x != y) {
 								if (!isExpect(i + 1, intList.get(y).getArray())) {
 									expect = false;
-//									 break loop3;
+									// break loop3;
 								}
 								// expect = isExpect(i + 1,
 								// intList.get(y).getArray());
@@ -270,6 +353,21 @@ public class TestQueuReconstruction {
 	}
 
 	public static void Println(int[][] t) {
+		for (int[] i : t) {
+			Print(i);
+		}
+		System.out.println("\n");
+	}
+
+	public static void Println(ArrayList<int[]> list) {
+		for (int[] i : list) {
+			Print(i);
+		}
+		System.out.println("\n");
+	}
+
+	public static void Println(String tag, int[][] t) {
+		System.out.println("tag");
 		for (int[] i : t) {
 			Print(i);
 		}
