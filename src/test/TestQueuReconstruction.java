@@ -103,59 +103,66 @@ class Bean {
 
 public class TestQueuReconstruction {
 	public static int[][] people = { { 5, 0 }, { 7, 0 }, { 4, 4 }, { 7, 1 }, { 6, 1 }, { 5, 2 } };
+	public static int[][] testPeople2 = { { 1, 0 }, { 2, 0 }, { 3, 0 }, { 4, 0 }, { 5, 0 }, { 6, 0 }, { 7, 0 } };
 
 	public static int[][] tempPeople = { { 5, 0 }, { 7, 0 }, { 4, 4 }, { 7, 1 }, { 6, 1 }, { 5, 2 } };
+
 	public static int[][] exceptPeople = { { 5, 0 }, { 7, 0 }, { 5, 2 }, { 6, 1 }, { 4, 4 }, { 7, 1 } };
 
 	public static void main(String[] args) {
-		// people = exceptPeople;
-		// System.out.println(getFrontNum(5, 5));
+//		people = testPeople2;
+		// int[] x = { 5, 2 };
+		// System.out.println(isExpect(2, x));
+		// System.out.println(getFrontNum(x, 5));
+		// Println(people);
+		// Println(exceptPeople);
 		reconstructQueue(people);
 	}
 
-	public static int[][] reconstructQueue(int[][] people) {
+	public static int[][] reconstructQueue(int[][] people1) {
+		people = people1;
 		for (int i = 0; i < people.length; i++) {
 			ArrayList<Bean> intList = new ArrayList();
-			// HashMap<Integer, int[]> intMap = new HashMap<Integer, int[]>();
 			int[] tempPeople = people[i];// 暂存当前位置i的数组
-			Println(people);
+
 			label: for (int j = i; j < people.length; j++) {
-				if (i == 0) {
-					if (people[j][1] == 0) {
-						// Print(people[j]);
-						if (people[i][0] > people[j][0]) {
-							int[] temp = people[i];
-							people[i] = people[j];
-							people[j] = temp;
-						}
-					}
-				}
+				// if (i == 0) {// 第一遍，首先找到可以放在第一位的，第一位的只有一个，不会出现多个
+				// if (people[j][1] == 0) {
+				// if (people[i][0] > people[j][0]) {
+				// int[] temp = people[i];
+				// people[i] = people[j];
+				// people[j] = temp;
+				// }
+				// }
+				// }
 				// System.out.println("i---" + i + "---j---" + j);
+				/** 从第二个开始，可能出现多个适合放在第i个位置的 */
+				// if (i > 0) {
+				/** 获取最适合的在此位置的数组，如果有三个适合在这个位置的，一个一个试，其他的放在它的后面都应该成立 */
+				int current = people[j][1];
+				int front = getFrontNum(j, i);
+				System.out.println("i=" + i + " --- j=" + j + " ---[" + people[j][0] + "," + people[j][1] + "]"
+						+ "--- current=" + current + " --- front=" + front);
+				if (current == front) {
+					/** 符合条件的存起来，一个一个的试，放在这个地方是否合适 */
+					intList.add(new Bean(people[j], j));
+					System.out.println("命中---------------------------------------第" + j + "个item，" + "size-----"
+							+ intList.size());
 
-				if (i > 0) {
-					/** 获取最适合的在此位置的数组，如果有三个适合在这个位置的，一个一个试，其他的放在它的后面都应该成立 */
-					int current = people[j][1];
-					int front = getFrontNum(j, i);
-					System.out.println("i---" + i + "---j---" + j + "---[" + people[j][0] + "," + people[j][1] + "]"
-							+ "---current---" + current + "---front---" + front);
-					if (current == front) {
-						/** 符合条件的存起来，一个一个的试，放在这个地方是否合适 */
-						intList.add(new Bean(people[j], j));
-						// intMap.put(j, people[j]);
-						System.out.println("命中---------------------------------------第" + j + "个item，" + "size-----"
-								+ intList.size());
-						if (intList.size() == 1) {
-							int[] temp = people[i];
-							people[i] = people[j];
-							people[j] = temp;
-							/** 如果只有一个命中，则直接替换 */
-							break label;
-						}
+				}
+				if (j == people.length - 1) {
+					System.out.println("size-----" + intList.size());
+					if (intList.size() == 1) {
+						int[] temp = people[i];
+						people[i] = intList.get(0).getArray();
+						people[intList.get(0).getPosition()] = temp;
+						/** 如果只有一个命中，则直接替换 */
+						break label;
 					}
 
-					boolean expect = true;
 					Bean bean = new Bean();
-					for (int x = 0; x < intList.size(); x++) {
+					loop3:for (int x = 0; x < intList.size(); x++) {
+						boolean expect = true;
 						int[] tempTarget = intList.get(x).getArray();
 						/** 第x个设置为当前位置的数组，测试其他的作为n+1是否合适的 */
 						people[i] = tempTarget;
@@ -163,12 +170,16 @@ public class TestQueuReconstruction {
 						for (int y = 0; y < intList.size(); y++) {
 							/** 测试数组里其他的在n+1是否合适 */
 							if (i + 1 < people.length && x != y) {
-								if (!isExpect(i + 1, tempTarget)) {
+								if (!isExpect(i + 1, intList.get(y).getArray())) {
 									expect = false;
+//									 break loop3;
 								}
+								// expect = isExpect(i + 1,
+								// intList.get(y).getArray());
 							}
 						}
-
+						System.out.println("expect=" + expect + "--x=" + x + "--[" + tempTarget[0] + ","
+								+ tempTarget[1] + "]");
 						if (expect) {
 							bean = intList.get(x);
 						}
@@ -176,11 +187,13 @@ public class TestQueuReconstruction {
 
 					people[i] = people[bean.getPosition()];
 					people[bean.getPosition()] = tempPeople;
-
 				}
+
+				// }
 			}
+			Println(people);
 		}
-		Print(people);
+		// Print(people);
 		return people;
 	}
 
@@ -234,8 +247,10 @@ public class TestQueuReconstruction {
 	 *            目标数组
 	 * @return 是否适合
 	 */
-	private static boolean isExpect(int targetIndex, int[] target) {
+	public static boolean isExpect(int targetIndex, int[] target) {
 		boolean isExpect = false;
+		System.out.println("targetIndex=" + targetIndex + "--getFrontNum=" + getFrontNum(target, targetIndex) + "--["
+				+ target[0] + "," + target[1] + "]");
 		if (getFrontNum(target, targetIndex) <= target[1]) {
 			isExpect = true;
 		}

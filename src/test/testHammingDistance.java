@@ -34,6 +34,7 @@ package test;
 public class testHammingDistance {
 	public static void main(String[] args) {
 		System.out.println("" + hammingDistance(0, 2147483647));
+		System.out.println(4&5);
 	}
 
 	/**
