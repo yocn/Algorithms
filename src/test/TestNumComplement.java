@@ -24,6 +24,8 @@ Explanation: The binary representation of 1 is 1 (no leading zero bits), and its
 public class TestNumComplement {
 
     public static void main(String[] args) {
+
+        System.out.println(Integer.highestOneBit(5));
         System.out.println(findComplement(10));
     }
 
@@ -40,7 +42,5 @@ public class TestNumComplement {
         return Integer.parseInt(
                 Integer.toBinaryString(~target).substring(32 - Integer.toBinaryString(target).length(), 32), 2);
     }
-    
-
 
 }
